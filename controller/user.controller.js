@@ -28,6 +28,18 @@ module.exports.getAllUsers = async (req, res, next) => {
   }
 };
 
+module.exports.getUser = async (req, res, next) => {
+  try {
+    const {
+      params: { id },
+    } = req;
+    const user = await User.findByPk(id);
+    res.send({ data: user });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports.updateUser = async (req, res, next) => {
   try {
     const {
