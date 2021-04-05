@@ -33,8 +33,16 @@ module.exports.getUser = async (req, res, next) => {
     const {
       params: { id },
     } = req;
-    const user = await User.findByPk(id);
-    res.send({ data: user });
+    const user = await User.findByPk(id, {
+      attributes: { exclude: ['password'] },
+    });
+
+    if (!user) {
+      const err = createError(404, 'User not found');
+      return next(err);
+    }
+
+    res.send(user);
   } catch (err) {
     next(err);
   }
@@ -54,6 +62,7 @@ module.exports.updateUser = async (req, res, next) => {
 
     // delete updatedUser.password;
     updatedUser.password = undefined;
+
 
     res.send({ data: updatedUser });
   } catch (err) {
@@ -84,8 +93,13 @@ module.exports.deleteUser = async (req, res, next) => {
     } = req;
 
     const user = await User.findByPk(id);
-
     const result = await user.destroy();
+
+    if (!result) {
+      const err = createError(404, 'No such user exists');
+      return next(err);
+    }
+
     console.log(result);
     res.send({ data: user });
   } catch (err) {

@@ -31,7 +31,13 @@ module.exports.getUserTask = async (req, res, next) => {
       params: { id },
     } = req;
     const task = await Task.findByPk(id);
-    res.send({ data: task });
+
+    if (!task) {
+      const err = createError(404, 'Task not found');
+      return next(err);
+    }
+
+    res.send(task);
   } catch (err) {
     next(err);
   }
@@ -55,7 +61,7 @@ module.exports.updateTask = async (req, res, next) => {
       body,
     } = req;
 
-    const [rowsCount, [updatedTask]] = await Task.update(body, {
+    const [, [updatedTask]] = await Task.update(body, {
       where: { id },
       returning: true,
     });
@@ -72,8 +78,13 @@ module.exports.deleteTasc = async (req, res, next) => {
     } = req;
 
     const task = await Task.findByPk(id);
-
     const result = await task.destroy();
+
+    if (!result) {
+      const err = createError(404, 'There is no such task');
+      return next(err);
+    }
+
     console.log(result);
     res.send({ data: task });
   } catch (err) {
