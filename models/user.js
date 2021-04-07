@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
         field: 'password_hash',
         allowNull: false,
         type: DataTypes.TEXT,
-        set (v) {
+        set () {
           this.setDataValue('password', 'new_hash');
         },
       },

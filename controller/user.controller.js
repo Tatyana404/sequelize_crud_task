@@ -1,10 +1,15 @@
+const createError = require('http-errors');
 const { User } = require('../models');
 
 module.exports.createUser = async (req, res, next) => {
   try {
     const { body } = req;
     const createdUser = await User.create(body);
-    console.log(createdUser);
+
+    if (!createdUser) {
+      return next(createError(400));
+    }
+
     res.status(201).send({
       data: createdUser,
     });
@@ -15,11 +20,18 @@ module.exports.createUser = async (req, res, next) => {
 
 module.exports.getAllUsers = async (req, res, next) => {
   try {
+    const { pagination = {} } = req;
     const users = await User.findAll({
       attributes: {
         exclude: ['password'],
       },
+      ...pagination,
     });
+
+    if (!users.length) {
+      return next(createError(404, 'Users not found'));
+    }
+
     res.status(200).send({
       data: users,
     });
@@ -31,9 +43,9 @@ module.exports.getAllUsers = async (req, res, next) => {
 module.exports.getUser = async (req, res, next) => {
   try {
     const {
-      params: { id },
+      params: { userId },
     } = req;
-    const user = await User.findByPk(id, {
+    const user = await User.findByPk(userId, {
       attributes: { exclude: ['password'] },
     });
 
@@ -42,7 +54,7 @@ module.exports.getUser = async (req, res, next) => {
       return next(err);
     }
 
-    res.send(user);
+    res.status(200).send(user);
   } catch (err) {
     next(err);
   }
@@ -51,36 +63,23 @@ module.exports.getUser = async (req, res, next) => {
 module.exports.updateUser = async (req, res, next) => {
   try {
     const {
-      params: { id },
+      params: { userId },
       body,
     } = req;
 
-    const [rowsCount, [updatedUser]] = await User.update(body, {
-      where: { id },
+    const [count, [updatedUser]] = await User.update(body, {
+      where: { userId },
       returning: true,
     });
+
+    if (rowsCount !== 1) {
+      return next(createError(400, 'User cant be updated'));
+    }
 
     // delete updatedUser.password;
     updatedUser.password = undefined;
 
-
-    res.send({ data: updatedUser });
-  } catch (err) {
-    next(err);
-  }
-};
-
-module.exports.updateUserInstance = async (req, res, next) => {
-  try {
-    const { body, userInstance } = req;
-
-    const updateduserInstance = await userInstance.update(body, {
-      returning: true,
-    });
-
-    updateduserInstance.password = undefined;
-
-    res.send({ data: updateduserInstance });
+    res.status(200).send({ data: updatedUser });
   } catch (err) {
     next(err);
   }
@@ -89,19 +88,18 @@ module.exports.updateUserInstance = async (req, res, next) => {
 module.exports.deleteUser = async (req, res, next) => {
   try {
     const {
-      params: { id },
+      params: { userId },
     } = req;
 
-    const user = await User.findByPk(id);
-    const result = await user.destroy();
+    const rowsCount = await User.destroy({
+      where: { id: userId },
+    });
 
-    if (!result) {
-      const err = createError(404, 'No such user exists');
-      return next(err);
+    if (!rowsCount) {
+      return next(createError(404, 'User not found'));
     }
 
-    console.log(result);
-    res.send({ data: user });
+    res.status(200).send({ data: `${rowsCount} User successfully deleted` });
   } catch (err) {
     next(err);
   }
