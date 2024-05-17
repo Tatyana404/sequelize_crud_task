@@ -1,19 +1,20 @@
-'use strict';
-const { Model } = require('sequelize');
-const { isAfter } = require('date-fns');
+"use strict";
+
+const { isAfter } = require("date-fns");
+const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    static associate (models) {
+    static associate(models) {
       User.hasMany(models.Task, {
-        foreignKey: 'userId',
+        foreignKey: "userId",
       });
     }
   }
   User.init(
     {
       firstName: {
-        field: 'first_name',
+        field: "first_name",
         allowNull: false,
         type: DataTypes.STRING,
         validate: {
@@ -22,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       lastName: {
-        field: 'last_name',
+        field: "last_name",
         allowNull: false,
         type: DataTypes.STRING,
         validate: {
@@ -41,35 +42,36 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       password: {
-        field: 'password_hash',
+        field: "password_hash",
         allowNull: false,
         type: DataTypes.TEXT,
-        set () {
-          this.setDataValue('password', 'new_hash');
+        set() {
+          this.setDataValue("password", "new_hash");
         },
       },
       birthday: {
         type: DataTypes.DATEONLY,
         validate: {
           isDate: true,
-          isValidDate (value) {
+          isValidDate(value) {
             if (isAfter(new Date(value), new Date())) {
-              throw new Error('Check your birthday, man');
+              throw new Error("Check your birthday !");
             }
           },
         },
       },
       isMale: {
-        field: 'is_male',
+        field: "is_male",
         type: DataTypes.BOOLEAN,
       },
     },
     {
       sequelize,
-      modelName: 'User',
-      tableName: 'users',
+      modelName: "User",
+      tableName: "users",
       underscored: true,
     }
   );
+
   return User;
 };

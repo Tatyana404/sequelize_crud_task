@@ -1,11 +1,12 @@
-'use strict';
-const { Model } = require('sequelize');
+"use strict";
+
+const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class Task extends Model {
-    static associate (models) {
+    static associate(models) {
       Task.belongsTo(models.User, {
-        foreignKey: 'userId',
+        foreignKey: "userId",
       }); // UserId | userId -> user_id
     }
   }
@@ -24,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         //......
       }, */
       isDone: {
-        field: 'is_done',
+        field: "is_done",
         allowNull: false,
         defaultValue: false,
         type: DataTypes.BOOLEAN,
@@ -41,10 +42,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'Task',
-      tableName: 'tasks',
+      modelName: "Task",
+      tableName: "tasks",
       underscored: true,
     }
   );
+
   return Task;
 };

@@ -1,5 +1,5 @@
-const createError = require('http-errors');
-const { User } = require('../models');
+const createError = require("http-errors");
+const { User } = require("../models");
 
 module.exports.createUser = async (req, res, next) => {
   try {
@@ -21,15 +21,16 @@ module.exports.createUser = async (req, res, next) => {
 module.exports.getAllUsers = async (req, res, next) => {
   try {
     const { pagination = {} } = req;
+
     const users = await User.findAll({
       attributes: {
-        exclude: ['password'],
+        exclude: ["password"],
       },
       ...pagination,
     });
 
     if (!users.length) {
-      return next(createError(404, 'Users not found'));
+      return next(createError(404, "Users not found"));
     }
 
     res.status(200).send({
@@ -43,14 +44,16 @@ module.exports.getAllUsers = async (req, res, next) => {
 module.exports.getUser = async (req, res, next) => {
   try {
     const {
-      params: { userId },
+      params: { id },
     } = req;
-    const user = await User.findByPk(userId, {
-      attributes: { exclude: ['password'] },
+
+    const user = await User.findByPk(id, {
+      attributes: { exclude: ["password"] },
     });
 
     if (!user) {
-      const err = createError(404, 'User not found');
+      const err = createError(404, "User not found");
+
       return next(err);
     }
 
@@ -63,17 +66,17 @@ module.exports.getUser = async (req, res, next) => {
 module.exports.updateUser = async (req, res, next) => {
   try {
     const {
-      params: { userId },
+      params: { id },
       body,
     } = req;
 
-    const [count, [updatedUser]] = await User.update(body, {
-      where: { userId },
+    const [rowsCount, [updatedUser]] = await User.update(body, {
+      where: { id },
       returning: true,
     });
 
     if (rowsCount !== 1) {
-      return next(createError(400, 'User cant be updated'));
+      return next(createError(400, "User can't be updated"));
     }
 
     // delete updatedUser.password;
@@ -88,15 +91,15 @@ module.exports.updateUser = async (req, res, next) => {
 module.exports.deleteUser = async (req, res, next) => {
   try {
     const {
-      params: { userId },
+      params: { id },
     } = req;
 
     const rowsCount = await User.destroy({
-      where: { id: userId },
+      where: { id },
     });
 
     if (!rowsCount) {
-      return next(createError(404, 'User not found'));
+      return next(createError(404, "User not found"));
     }
 
     res.status(200).send({ data: `${rowsCount} User successfully deleted` });

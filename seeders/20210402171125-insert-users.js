@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const generateUser = key => ({
+const generateUser = (key) => ({
   first_name: `Name${key}`,
   last_name: `Surname${key}`,
   email: `email${key}@gmail.com`,
@@ -11,16 +11,13 @@ const generateUser = key => ({
   updated_at: new Date(),
 });
 
-const generateUsers = (amount = 50) => {
-  return new Array(amount > 600 ? 600 : amount)
+const generateUsers = (amount = 50) =>
+  new Array(amount > 600 ? 600 : amount)
     .fill(null)
     .map((_, i) => generateUser(i + 1));
-};
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkInsert('users', generateUsers(120), {});
+  up: async (queryInterface) => {
+    await queryInterface.bulkInsert("users", generateUsers(120), {});
   },
-
-  down: async (queryInterface, Sequelize) => {},
 };

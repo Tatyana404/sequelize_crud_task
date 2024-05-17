@@ -1,8 +1,8 @@
-const createError = require('http-errors');
-const _ = require('lodash');
-const { Task } = require('../models');
+const createError = require("http-errors");
+const _ = require("lodash");
+const { Task } = require("../models");
 
-const checkBody = body => _.pick(body, ['isDone', 'deadline', 'body']);
+const checkBody = (body) => _.pick(body, ["isDone", "deadline", "body"]);
 
 module.exports.createTask = async (req, res, next) => {
   try {
@@ -29,7 +29,7 @@ module.exports.getUserTasks = async (req, res, next) => {
     const tasks = await user.getTasks({ ...pagination });
 
     if (!tasks.length) {
-      return next(createError(400, 'User withhout tasks'));
+      return next(createError(400, "User without tasks"));
     }
 
     res.send({ data: tasks });
@@ -41,9 +41,9 @@ module.exports.getUserTasks = async (req, res, next) => {
 // module.exports.getTask = async (req, res, next) => {
 //   try {
 //     const {
-//       body: { taskId },
+//       body: { id },
 //     } = req;
-//     const task = await Task.findByPk(taskId);
+//     const task = await Task.findByPk(id);
 
 //     if (!task) {
 //       const err = createError(404, 'Task not found');
@@ -62,7 +62,8 @@ module.exports.getAllTasks = async (req, res, next) => {
     const tasks = await Task.findAll({ ...pagination });
 
     if (!tasks) {
-      const err = createError(404, 'Tasks have not been created yet');
+      const err = createError(404, "Tasks have not been created yet");
+
       return next(err);
     }
 
@@ -77,14 +78,14 @@ module.exports.getAllTasks = async (req, res, next) => {
 module.exports.updateTask = async (req, res, next) => {
   try {
     const {
-      params: { taskId },
+      params: { id },
       body,
     } = req;
 
     const values = checkBody(body);
 
-    const [count, [updatedTask]] = await Task.update(values, {
-      where: { id: taskId },
+    const [, [updatedTask]] = await Task.update(values, {
+      where: { id },
       returning: true,
     });
 
@@ -101,15 +102,15 @@ module.exports.updateTask = async (req, res, next) => {
 module.exports.deleteTask = async (req, res, next) => {
   try {
     const {
-      params: { taskId },
+      params: { id },
     } = req;
 
     const rowsCount = await Task.destroy({
-      where: { id: taskId },
+      where: { id },
     });
 
     if (!rowsCount) {
-      return next(createError(404, 'There is no such task'));
+      return next(createError(404, "There is no such task"));
     }
 
     res.status(200).send({ data: `${rowsCount} Task successfully deleted` });

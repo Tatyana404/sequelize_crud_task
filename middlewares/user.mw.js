@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User } = require("../models");
 
 module.exports.checkUser = async (req, res, next) => {
   try {
@@ -9,13 +9,13 @@ module.exports.checkUser = async (req, res, next) => {
     const userInstance = await User.findByPk(id);
 
     if (!userInstance) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     req.userInstance = userInstance;
+
     next();
   } catch (err) {
     next(err);
   }
 };
-
