@@ -6,10 +6,10 @@ const { checkUser } = require("../middlewares/user.mw");
 const taskRouter = Router();
 
 taskRouter.get("/:id", checkUser, pagination, TaskController.getUserTasks);
-// taskRouter.get('/:id', TaskController.getTask);
-taskRouter.get("/", pagination, TaskController.getAllTasks);
 taskRouter.post("/:id", checkUser, TaskController.createTask);
-taskRouter.patch("/:id", TaskController.updateTask);
+taskRouter.get("/", pagination, TaskController.getAllTasks);
 taskRouter.delete("/:id", TaskController.deleteTask);
+taskRouter.patch("/:id", TaskController.updateTask);
+taskRouter.get('/:id', TaskController.getTask);
 
 module.exports = taskRouter;

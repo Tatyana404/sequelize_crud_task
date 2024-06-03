@@ -17,7 +17,6 @@ const generateUsers = (amount = 50) =>
     .map((_, i) => generateUser(i + 1));
 
 module.exports = {
-  up: async (queryInterface) => {
-    await queryInterface.bulkInsert("users", generateUsers(120), {});
-  },
+  up: async (queryInterface) =>
+    await queryInterface.bulkInsert("users", generateUsers(120), {}),
 };

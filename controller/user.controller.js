@@ -4,14 +4,15 @@ const { User } = require("../models");
 module.exports.createUser = async (req, res, next) => {
   try {
     const { body } = req;
-    const createdUser = await User.create(body);
 
-    if (!createdUser) {
+    const user = await User.create(body);
+
+    if (!user) {
       return next(createError(400));
     }
 
     res.status(201).send({
-      data: createdUser,
+      data: user,
     });
   } catch (err) {
     next(err);
@@ -23,9 +24,7 @@ module.exports.getAllUsers = async (req, res, next) => {
     const { pagination = {} } = req;
 
     const users = await User.findAll({
-      attributes: {
-        exclude: ["password"],
-      },
+      attributes: { exclude: ["password"] },
       ...pagination,
     });
 
@@ -52,12 +51,10 @@ module.exports.getUser = async (req, res, next) => {
     });
 
     if (!user) {
-      const err = createError(404, "User not found");
-
-      return next(err);
+      return next(createError(404, "User not found"));
     }
 
-    res.status(200).send(user);
+    res.status(200).send({ data: user });
   } catch (err) {
     next(err);
   }

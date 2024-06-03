@@ -6,10 +6,10 @@ const checkBody = (body) => _.pick(body, ["isDone", "deadline", "body"]);
 
 module.exports.createTask = async (req, res, next) => {
   try {
-    const { body, userInstance } = req;
+    const { userInstance, body } = req;
 
     const values = checkBody(body);
-    // const task = await Task.create({ ...body, userId: id });
+
     const task = await userInstance.createTask(values);
 
     if (!task) {
@@ -24,9 +24,9 @@ module.exports.createTask = async (req, res, next) => {
 
 module.exports.getUserTasks = async (req, res, next) => {
   try {
-    const { userInstance: user, pagination } = req;
+    const { userInstance, pagination } = req;
 
-    const tasks = await user.getTasks({ ...pagination });
+    const tasks = await userInstance.getTasks({ ...pagination });
 
     if (!tasks.length) {
       return next(createError(400, "User without tasks"));
@@ -38,38 +38,35 @@ module.exports.getUserTasks = async (req, res, next) => {
   }
 };
 
-// module.exports.getTask = async (req, res, next) => {
-//   try {
-//     const {
-//       body: { id },
-//     } = req;
-//     const task = await Task.findByPk(id);
-
-//     if (!task) {
-//       const err = createError(404, 'Task not found');
-//       return next(err);
-//     }
-
-//     res.status(200).send(task);
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
 module.exports.getAllTasks = async (req, res, next) => {
   try {
     const { pagination = {} } = req;
+
     const tasks = await Task.findAll({ ...pagination });
 
-    if (!tasks) {
-      const err = createError(404, "Tasks have not been created yet");
-
-      return next(err);
+    if (!tasks.length) {
+      return next(createError(404, "Tasks not found"));
     }
 
-    res.status(200).send({
-      data: tasks,
-    });
+    res.status(200).send({ data: tasks });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.getTask = async (req, res, next) => {
+  try {
+    const {
+      body: { id },
+    } = req;
+
+    const task = await Task.findByPk(id);
+
+    if (!task) {
+      return next(createError(404, "Task not found"));
+    }
+
+    res.status(200).send({ data: task });
   } catch (err) {
     next(err);
   }
@@ -84,13 +81,13 @@ module.exports.updateTask = async (req, res, next) => {
 
     const values = checkBody(body);
 
-    const [, [updatedTask]] = await Task.update(values, {
+    const [rowsCount, [updatedTask]] = await Task.update(values, {
       where: { id },
       returning: true,
     });
 
-    if (!updatedTask) {
-      return next(createError(400));
+    if (rowsCount !== 1) {
+      return next(createError(400, "Task can't be updated"));
     }
 
     res.status(200).send({ data: updatedTask });
@@ -110,7 +107,7 @@ module.exports.deleteTask = async (req, res, next) => {
     });
 
     if (!rowsCount) {
-      return next(createError(404, "There is no such task"));
+      return next(createError(404, "Task not found"));
     }
 
     res.status(200).send({ data: `${rowsCount} Task successfully deleted` });
