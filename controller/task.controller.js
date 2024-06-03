@@ -4,7 +4,7 @@ const { Task } = require("../models");
 
 const checkBody = (body) => _.pick(body, ["isDone", "deadline", "body"]);
 
-module.exports.createTask = async (req, res, next) => {
+module.exports.createUserTask = async (req, res, next) => {
   try {
     const { userInstance, body } = req;
 

@@ -1,6 +1,6 @@
-POST http://localhost:5000/api/tasks/10
+POST http://localhost:5000/api/users/10/task
 Content-Type: application/json
 
 {
-  "body": "Test30"
+  "body": "new task"
 }
