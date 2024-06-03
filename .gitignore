@@ -1,8 +1,7 @@
 .*
 !.gitignore
+!.env.example
 
-/node_modules/
-/.vscode/
-/.idea/
-**/sandbox/
 /sequelize*.json
+/node_modules/
+**/sandbox/
