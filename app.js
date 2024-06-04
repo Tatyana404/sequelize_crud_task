@@ -4,10 +4,8 @@ const router = require("./routes");
 
 const app = express();
 
-app.use(express.json()); // data stream -> json -> js object -> req.body
-/* 
-  http://localhost:5000/api/*
- */
+app.use(express.json());
+
 app.use("/api", router);
 
 app.use(errorHandler);
